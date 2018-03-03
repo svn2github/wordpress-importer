@@ -5,7 +5,7 @@ Plugin URI: https://wordpress.org/plugins/wordpress-importer/
 Description: Import posts, pages, comments, custom fields, categories, tags and more from a WordPress export file.
 Author: wordpressdotorg
 Author URI: https://wordpress.org/
-Version: 0.6.4
+Version: 0.6.5-alpha
 Text Domain: wordpress-importer
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
@@ -262,7 +262,7 @@ class WP_Import extends WP_Importer {
 
 <?php if ( ! empty( $this->authors ) ) : ?>
 	<h3><?php _e( 'Assign Authors', 'wordpress-importer' ); ?></h3>
-	<p><?php _e( 'To make it easier for you to edit and save the imported content, you may want to reassign the author of the imported item to an existing user of this site. For example, you may want to import all the entries as <code>admin</code>s entries.', 'wordpress-importer' ); ?></p>
+	<p><?php _e( 'To make it simpler for you to edit and save the imported content, you may want to reassign the author of the imported item to an existing user of this site, such as your primary administrator account.', 'wordpress-importer' ); ?></p>
 <?php if ( $this->allow_create_users() ) : ?>
 	<p><?php printf( __( 'If a new user is created by WordPress, a new password will be randomly generated and the new user&#8217;s role will be set as %s. Manually changing the new user&#8217;s details will be necessary.', 'wordpress-importer' ), esc_html( get_option('default_role') ) ); ?></p>
 <?php endif; ?>
@@ -315,11 +315,19 @@ class WP_Import extends WP_Importer {
 			echo ' <input type="text" name="user_new['.$n.']" value="'. $value .'" /><br />';
 		}
 
-		if ( ! $create_users && $this->version == '1.0' )
+		if ( ! $create_users && $this->version == '1.0' ) {
 			_e( 'assign posts to an existing user:', 'wordpress-importer' );
-		else
+		} else {
 			_e( 'or assign posts to an existing user:', 'wordpress-importer' );
-		wp_dropdown_users( array( 'name' => "user_map[$n]", 'multi' => true, 'show_option_all' => __( '- Select -', 'wordpress-importer' ) ) );
+		}
+
+		wp_dropdown_users( array(
+			'name'            => "user_map[$n]",
+			'multi'           => true,
+			'show_option_all' => __( '- Select -', 'wordpress-importer' ),
+			'show'            => 'display_name_with_login',
+		) );
+
 		echo '<input type="hidden" name="imported_authors['.$n.']" value="' . esc_attr( $author['author_login'] ) . '" />';
 
 		if ( $this->version != '1.0' )
